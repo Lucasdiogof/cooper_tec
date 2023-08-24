@@ -13,11 +13,9 @@ dependencies:
   get_it:
   equatable:
   flutter_bloc:
-  bloc_test:
   http:
-  dio:
   dartz:
-  mocktail:
+  crypto:
 
 dev_dependencies:
   flutter_test:

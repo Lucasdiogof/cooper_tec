@@ -27,7 +27,7 @@ class LoginPage extends StatelessWidget {
               TextFormField(
                 validator: (value) {
                   if (value != null && value.length < 4) {
-                    return 'O Email não pode ser menor do que 6 caracteres';
+                    return 'Email inválido';
                   }
                   return null;
                 },
@@ -45,7 +45,7 @@ class LoginPage extends StatelessWidget {
               TextFormField(
                 validator: (value) {
                   if (value != null && value.length < 6) {
-                    return 'Senha não pode ser menor do que 6 caracteres';
+                    return 'A senha não pode ser menor do que 6 caracteres';
                   }
                   return null;
                 },

@@ -11,10 +11,9 @@ dependencies:
     sdk: flutter
 
   crypto:
-  cupertino_icons: ^1.0.2
+  cupertino_icons:
   get_it:
   dartz:
-  equatable:
   flutter_bloc:
   http:
 

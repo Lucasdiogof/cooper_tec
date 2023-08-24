@@ -20,6 +20,9 @@ class DetailedCharacterWidget extends StatelessWidget {
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               border: Border.all(),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(5.0),
+              ),
             ),
             child: Text('Id: ${character.id}'),
           ),

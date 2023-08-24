@@ -1,7 +1,8 @@
 import 'package:cooper_tec/features/presentation/cubits/home_cubit.dart';
-import 'package:cooper_tec/features/presentation/pages/detailed_character_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../widgets/character_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,24 +32,8 @@ class _HomePageState extends State<HomePage> {
                 child: ListView.builder(
               itemCount: state.marvelEntity.characters.length,
               itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return DetailedCharacterPage(
-                              character: state.marvelEntity.characters[index]);
-                        },
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                    margin: const EdgeInsets.only(
-                      bottom: 16,
-                    ),
-                    child: Text(state.marvelEntity.characters[index].name),
-                  ),
+                return CharacterWidget(
+                  character: state.marvelEntity.characters[index],
                 );
               },
             ));

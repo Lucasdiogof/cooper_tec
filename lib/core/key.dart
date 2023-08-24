@@ -9,16 +9,14 @@ class Helper {
 
 var url = "http://gateway.marvel.com/v1/public/characters";
 var timeStamp = DateTime.now();
-var hash = '';
+late String hash;
 
 String convertUrl() {
-  gerarHash();
-  String urlFinal =
-      "$url?apikey=${Helper.publicApiKey}&hash=$hash&ts=${timeStamp.toIso8601String()}";
-  return urlFinal;
+  _gerarHash();
+  return "$url?apikey=${Helper.publicApiKey}&hash=$hash&ts=${timeStamp.toIso8601String()}";
 }
 
-gerarHash() {
+void _gerarHash() {
   hash = generateMd5(
       timeStamp.toIso8601String() + Helper.privateApiKey + Helper.publicApiKey);
 }

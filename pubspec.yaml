@@ -9,13 +9,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  crypto:
   cupertino_icons: ^1.0.2
   get_it:
+  dartz:
   equatable:
   flutter_bloc:
   http:
-  dartz:
-  crypto:
 
 dev_dependencies:
   flutter_test:

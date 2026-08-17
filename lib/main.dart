@@ -1,8 +1,10 @@
+import 'package:cooper_tec/core/env_config.dart';
 import 'package:cooper_tec/core/injection.dart';
 import 'package:cooper_tec/features/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  EnvConfig.validate();
   init();
   runApp(const MyApp());
 }

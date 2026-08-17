@@ -10,7 +10,6 @@ class DetailedCharacterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scrollController = ScrollController();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -24,24 +23,29 @@ class DetailedCharacterWidget extends StatelessWidget {
                 Radius.circular(5.0),
               ),
             ),
-            child: Text('Id: ${character.id}'),
+            child: Text('ID: ${character.id}'),
           ),
         ),
         const Padding(
           padding: EdgeInsets.only(top: 20, bottom: 10),
           child: Text(
-            'Séries:',
+            'Series:',
             style: TextStyle(color: Colors.black, fontSize: 20),
           ),
         ),
-        ListView.builder(
-          controller: scrollController,
-          shrinkWrap: true,
-          itemCount: character.series.length,
-          itemBuilder: (context, index) {
-            return SeriesWidget(name: character.series[index].name);
-          },
-        )
+        character.series.isEmpty
+            ? const Text(
+                'No series found for this hero.',
+                style: TextStyle(color: Colors.black54),
+              )
+            : ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: character.series.length,
+                itemBuilder: (context, index) {
+                  return SeriesWidget(name: character.series[index].name);
+                },
+              )
       ],
     );
   }

@@ -1,15 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 
 import '../../../core/failure.dart';
 import '../../domain/entities/marvel_entity.dart';
 import '../../domain/repositories/i_marvel_repository.dart';
-import '../../domain/entities/character_entity.dart';
 import '../datasources/marvel_remote_datasource.dart';
-import '../models/character_model.dart';
-import 'package:http/http.dart' as http;
-
 import '../models/marvel_model.dart';
 
 class MarvelRepository implements IMarvelRepository {
@@ -21,11 +18,27 @@ class MarvelRepository implements IMarvelRepository {
 
   @override
   Future<Either<Failure, MarvelEntity>> getCharacters() async {
-    final http.Response response = await _remoteDataSource.getCharacters();
-    if (response.statusCode == 200) {
-      final characters = MarvelModel.fromMap(jsonDecode(response.body));
-      return Right(characters);
+    try {
+      final response = await _remoteDataSource.getCharacters();
+      if (response.statusCode == 200) {
+        final characters = MarvelModel.fromMap(jsonDecode(response.body));
+        return Right(characters);
+      }
+      return Left(
+        Failure('Failed to load heroes (status ${response.statusCode}).'),
+      );
+    } on SocketException {
+      return const Left(
+        Failure('No internet connection. Please check your network.'),
+      );
+    } on FormatException {
+      return const Left(
+        Failure('Received an unexpected response from the server.'),
+      );
+    } catch (_) {
+      return const Left(
+        Failure('Something went wrong while loading the heroes.'),
+      );
     }
-    return Left(Failure());
   }
 }

@@ -1,17 +1,22 @@
-import 'package:cooper_tec/core/key.dart';
+import 'package:cooper_tec/core/marvel_url_builder.dart';
 import 'package:http/http.dart' as http;
 
 abstract class IMarvelRemoteDataSource {
-  Future<dynamic> getCharacters();
+  Future<http.Response> getCharacters();
 }
 
 class MarvelRemoteDataSource implements IMarvelRemoteDataSource {
-  final http.Client client = http.Client();
+  const MarvelRemoteDataSource({
+    required http.Client client,
+    required MarvelUrlBuilder urlBuilder,
+  })  : _client = client,
+        _urlBuilder = urlBuilder;
+
+  final http.Client _client;
+  final MarvelUrlBuilder _urlBuilder;
 
   @override
-  Future<dynamic> getCharacters() async {
-    return await client.get(
-      Uri.parse(convertUrl()),
-    );
+  Future<http.Response> getCharacters() {
+    return _client.get(_urlBuilder.buildCharactersUrl());
   }
 }

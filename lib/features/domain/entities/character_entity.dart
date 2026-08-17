@@ -1,6 +1,7 @@
 import 'package:cooper_tec/features/domain/entities/character_series_entity.dart';
+import 'package:equatable/equatable.dart';
 
-class CharacterEntity {
+class CharacterEntity extends Equatable {
   const CharacterEntity({
     required this.id,
     required this.name,
@@ -14,4 +15,7 @@ class CharacterEntity {
   final String description;
   final String modified;
   final List<CharacterSeriesEntity> series;
+
+  @override
+  List<Object?> get props => [id, name, description, modified, series];
 }

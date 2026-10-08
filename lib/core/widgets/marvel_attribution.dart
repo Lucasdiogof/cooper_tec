@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/l10n.dart';
 
-/// Marvel's API terms ask apps to credit them wherever their data is shown.
 class MarvelAttribution extends StatelessWidget {
   const MarvelAttribution({super.key});
 

@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 
 import '../error/failure.dart';
 
-/// Either a value or a [Failure], meant to be consumed with a `switch`.
 sealed class Result<T> extends Equatable {
   const Result();
 }

@@ -35,8 +35,7 @@ abstract final class AppTheme {
         centerTitle: false,
         scrolledUnderElevation: 0,
         backgroundColor: colorScheme.surface,
-        // The base text theme has no font sizes yet (Theme.of merges them in
-        // later), so the size has to be explicit here.
+        // base.textTheme has no sizes yet, they're only merged in Theme.of.
         titleTextStyle: TextStyle(
           fontFamily: displayFont,
           fontSize: 32,

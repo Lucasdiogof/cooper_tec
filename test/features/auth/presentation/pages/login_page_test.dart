@@ -15,7 +15,6 @@ class _MockCharactersCubit extends MockCubit<CharactersState>
 void main() {
   setUp(() {
     final cubit = _MockCharactersCubit();
-    // A settled state, so pumpAndSettle doesn't wait on the loading skeleton.
     when(
       () => cubit.state,
     ).thenReturn(const CharactersState(status: CharactersStatus.success));

@@ -15,7 +15,6 @@ void main() {
   testWidgets('falls back to the initials when the image fails to load', (
     tester,
   ) async {
-    // Network images always fail inside widget tests.
     await tester.pumpApp(
       const CharacterImage(
         name: 'Black Widow',

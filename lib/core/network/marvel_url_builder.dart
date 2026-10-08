@@ -2,11 +2,6 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 
-/// Builds signed URLs for the Marvel API.
-///
-/// Every request needs a timestamp and an md5 of
-/// `timestamp + privateKey + publicKey`, as described in
-/// https://developer.marvel.com/documentation/authorization.
 class MarvelUrlBuilder {
   MarvelUrlBuilder({
     required String publicKey,

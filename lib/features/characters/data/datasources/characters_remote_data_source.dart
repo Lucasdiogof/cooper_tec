@@ -7,9 +7,6 @@ import '../../../../core/network/marvel_url_builder.dart';
 import '../models/paginated_characters_model.dart';
 
 abstract interface class CharactersRemoteDataSource {
-  /// Throws [ServerException] for non-200 responses, [FormatException] or
-  /// [TypeError] for unexpected payloads and [http.ClientException] for
-  /// connectivity problems.
   Future<PaginatedCharactersModel> getCharacters({
     required int offset,
     required int limit,
@@ -46,8 +43,7 @@ class MarvelCharactersRemoteDataSource implements CharactersRemoteDataSource {
       throw ServerException(response.statusCode);
     }
 
-    // Decode the bytes ourselves: `response.body` falls back to latin1 when
-    // the content-type has no charset, which mangles names like "Rōnin".
+    // response.body falls back to latin1 when there's no charset header.
     final json = jsonDecode(utf8.decode(response.bodyBytes));
     if (json is! Map<String, dynamic>) {
       throw const FormatException('Expected a JSON object');

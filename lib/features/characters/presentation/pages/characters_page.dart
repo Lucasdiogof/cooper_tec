@@ -97,8 +97,6 @@ class _CharactersViewState extends State<CharactersView> {
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(context.l10n.refreshFailed)));
     }
-    // On large screens the first page may not fill the viewport, in which
-    // case the user can't scroll to trigger the next one.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _loadMoreIfNeeded();
     });

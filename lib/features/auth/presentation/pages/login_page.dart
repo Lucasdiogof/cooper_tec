@@ -5,8 +5,6 @@ import '../../../../core/validation/validators.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../characters/presentation/pages/characters_page.dart';
 
-/// There is no backend behind this screen: it only validates the form and
-/// lets the user in, which is all the original case asked for.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 

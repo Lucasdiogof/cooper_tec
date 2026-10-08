@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../core/widgets/status_view.dart';
 import '../l10n/l10n.dart';
 
-/// Shown instead of the app when it was started without the Marvel keys,
-/// so whoever cloned the repo sees what to do instead of a red error screen.
 class MissingConfigPage extends StatelessWidget {
   const MissingConfigPage({super.key});
 

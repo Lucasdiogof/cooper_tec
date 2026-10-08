@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Errors the domain layer knows about. The UI decides how to word them.
 sealed class Failure extends Equatable {
   const Failure();
 

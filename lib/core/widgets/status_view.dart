@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Centered icon + title + message, used for empty and error states.
 class StatusView extends StatelessWidget {
   const StatusView({
     super.key,

@@ -8,7 +8,6 @@ class PaginatedCharactersModel extends PaginatedCharacters {
     required super.total,
   });
 
-  /// Parses the whole response envelope returned by `/v1/public/characters`.
   factory PaginatedCharactersModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>;
     final results = data['results'] as List<dynamic>;

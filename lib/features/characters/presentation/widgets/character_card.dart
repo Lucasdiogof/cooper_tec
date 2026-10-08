@@ -50,7 +50,6 @@ class CharacterCard extends StatelessWidget {
               ),
             ),
           ),
-          // The ink splash has to sit above the image to be visible.
           Material(
             type: MaterialType.transparency,
             child: InkWell(onTap: onTap),

@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
-/// Character artwork with a generated placeholder for missing or broken
-/// images.
-///
-/// When [highResUrl] is given, [url] is shown first (it is usually already
-/// cached by the list) and the bigger image fades in on top once it loads.
 class CharacterImage extends StatelessWidget {
   const CharacterImage({
     super.key,
@@ -83,7 +78,6 @@ class _Placeholder extends StatelessWidget {
     return words.take(2).map((word) => word[0].toUpperCase()).join();
   }
 
-  // Derived from the name so each character keeps the same colour.
   double get _hue =>
       name.codeUnits.fold<int>(0, (sum, unit) => sum + unit) % 360.0;
 

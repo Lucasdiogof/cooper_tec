@@ -158,7 +158,6 @@ class _StatsRow extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Four across on most phones, two by two on very narrow screens.
         final columns = constraints.maxWidth < 340 ? 2 : 4;
         const spacing = 8.0;
         final width =

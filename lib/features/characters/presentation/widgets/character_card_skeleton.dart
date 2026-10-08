@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Pulsing grey card shown while the first page is loading.
 class CharacterCardSkeleton extends StatefulWidget {
   const CharacterCardSkeleton({super.key});
 

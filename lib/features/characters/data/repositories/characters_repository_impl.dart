@@ -36,14 +36,13 @@ class CharactersRepositoryImpl implements CharactersRepository {
     } on FormatException {
       return const Err(ParsingFailure());
     } on TypeError {
-      // A field with an unexpected type in the payload.
       return const Err(ParsingFailure());
     } catch (_) {
       return const Err(UnexpectedFailure());
     }
   }
 
-  // 409 is what Marvel returns for a missing key, hash or timestamp.
+  // Marvel answers 409 when the key, hash or timestamp is missing.
   Failure _failureForStatus(int statusCode) => switch (statusCode) {
     401 || 403 || 409 => const UnauthorizedFailure(),
     429 => const RateLimitFailure(),

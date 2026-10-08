@@ -38,10 +38,8 @@ class CharacterModel extends Character {
     );
   }
 
-  // Marvel serves this artwork when a character has no picture of its own.
   static const _missingImageIds = ['image_not_available', '4c002e0305708'];
 
-  /// See https://developer.marvel.com/documentation/images for the variants.
   static String? _imageUrl(Map<String, dynamic>? thumbnail, {String? variant}) {
     final path = thumbnail?['path'] as String?;
     final extension = thumbnail?['extension'] as String?;
@@ -59,8 +57,6 @@ class CharacterModel extends Character {
     return 0;
   }
 
-  // A few characters come back with placeholder dates such as
-  // "-0001-11-30T00:00:00-0500", which are worse than no date at all.
   static DateTime? _parseModified(String? value) {
     final date = value == null ? null : DateTime.tryParse(value);
     if (date == null || date.year < 1900) return null;

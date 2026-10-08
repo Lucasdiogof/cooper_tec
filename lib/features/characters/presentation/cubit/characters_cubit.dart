@@ -13,8 +13,7 @@ class CharactersCubit extends Cubit<CharactersState> {
 
   final GetCharacters _getCharacters;
 
-  // Bumped on every first-page request. Responses that come back after a
-  // newer search started are dropped, so typing fast can't show stale results.
+  // Used to drop responses from searches that were already replaced.
   int _generation = 0;
 
   Future<void> load() => _loadFirstPage(query: state.query);
@@ -27,7 +26,6 @@ class CharactersCubit extends Cubit<CharactersState> {
     return _loadFirstPage(query: trimmed);
   }
 
-  /// Reloads the first page while keeping the current list on screen.
   Future<void> refresh() =>
       _loadFirstPage(query: state.query, keepCharacters: true);
 

@@ -14,8 +14,6 @@ class CharactersState extends Equatable {
     this.failure,
   });
 
-  /// Status of the first page. Pagination has its own flags so a failed
-  /// "load more" doesn't throw away what is already on screen.
   final CharactersStatus status;
   final List<Character> characters;
   final int total;

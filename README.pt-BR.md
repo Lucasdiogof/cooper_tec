@@ -1,76 +1,113 @@
-# Cooper Tec
+# Cooper Tec · Heróis Marvel
 
-Leia em: [English](README.md) | **Português**
+[English](README.md) · **Português** · [Español](README.es.md)
 
-Um pequeno projeto Flutter feito como teste técnico para uma entrevista de emprego na CooperTec. O app faz login, busca uma lista de heróis da [API da Marvel](https://developer.marvel.com) e permite abrir um herói para ver seu id e as séries em que ele aparece.
+[![CI](https://github.com/Lucasdiogof/cooper_tec/actions/workflows/ci.yml/badge.svg)](https://github.com/Lucasdiogof/cooper_tec/actions/workflows/ci.yml)
 
-## Por que essas escolhas
+Um app Flutter que lista os personagens da Marvel usando a [API oficial da Marvel](https://developer.marvel.com). Fiz a primeira versão em 2023, como case técnico para uma entrevista de emprego na CooperTec, quando eu ainda estava começando com Flutter. Depois voltei nele e reescrevi boa parte com o que aprendi desde então, mantendo o escopo original: uma tela de login, uma lista de heróis e uma tela de detalhes.
 
-- **Clean Architecture** — o projeto é pequeno, mas separar as camadas `data` / `domain` / `presentation` mantém a API da Marvel, as regras de negócio e a UI independentes entre si, e deixa cada parte fácil de testar isoladamente.
-- **Cubit** (uma subgerência do `flutter_bloc`) — uma alternativa mais leve ao Bloc completo, adequada à máquina de estados simples deste projeto (`initial → loading → success/error`).
-- **GetIt** para injeção de dependência, conectando datasource, repositório, use case e cubit em [`lib/core/injection.dart`](lib/core/injection.dart).
-- **`Either` do dartz** para deixar as falhas explícitas na camada de domínio, em vez de depender de exceções lançadas.
+A ideia do repositório é mostrar como eu organizo um projeto Flutter, então aqui o código importa mais do que a quantidade de funcionalidades.
 
-## Fluxo do app
+## O que o app faz
 
-1. **Login** — validação simples no cliente (formato de email válido e senha com 6+ caracteres). Não há backend real por trás; é apenas uma porta de entrada para o fluxo principal.
-2. **Lista de heróis** — começa em estado de carregamento e depois exibe os heróis retornados pela API da Marvel. Uma falha na requisição mostra uma mensagem com um botão de tentar novamente, em vez de simplesmente falhar em silêncio.
-3. **Detalhes do herói** — mostra o id do herói e as séries em que ele já apareceu.
+- **Login** com validação de formulário. Não existe backend por trás, o case pedia só a tela.
+- **Grade de heróis** com scroll infinito, puxar para atualizar e busca por nome (com debounce enquanto você digita).
+- **Detalhes** com a imagem, descrição, quantidade de quadrinhos, séries, histórias e eventos, e as séries em que o herói aparece.
+- Estados de carregamento, vazio e erro, com opção de tentar novamente tanto na primeira página quanto nas seguintes.
+- Tema claro e escuro, seguindo o sistema.
+- Interface em inglês, português e espanhol, escolhida pelo idioma do aparelho.
 
-## Estrutura do projeto
+## Arquitetura
+
+O código é separado por feature, e cada feature segue Clean Architecture com três camadas:
 
 ```
 lib/
-├── core/                    # configuração de ambiente, DI, geração da URL/hash da Marvel
-└── features/
-    ├── data/                # datasource remoto, implementação do repositório, DTOs
-    ├── domain/               # entidades, contrato do repositório, use case
-    └── presentation/         # cubit, páginas e widgets
+├── app/                      # MaterialApp, tema e configuração de idiomas
+├── core/                     # o que é compartilhado entre as features
+│   ├── config/               # chaves lidas com --dart-define
+│   ├── di/                   # registros do get_it
+│   ├── error/                # exceptions (data) e failures (domain)
+│   ├── network/              # URLs assinadas da API da Marvel
+│   ├── result/               # Result<T> = Ok | Err
+│   ├── theme/
+│   ├── validation/
+│   └── widgets/
+├── features/
+│   ├── auth/presentation/    # tela de login
+│   └── characters/
+│       ├── data/             # data source remoto, models do JSON, implementação do repositório
+│       ├── domain/           # entidades, contrato do repositório, use case GetCharacters
+│       └── presentation/     # cubit, páginas e widgets
+└── l10n/                     # arquivos .arb (en, pt, es) e código gerado
 ```
+
+Uma requisição passa pelas camadas assim:
+
+```
+CharactersPage → CharactersCubit → GetCharacters → CharactersRepository → MarvelCharactersRemoteDataSource → API da Marvel
+```
+
+- O **data source** só conversa com HTTP: monta a URL assinada, decodifica o JSON e lança exceções quando algo dá errado.
+- O **repositório** transforma essas exceções em uma `Failure` (sem conexão, chaves inválidas, limite de requisições, erro no servidor, resposta ilegível) e devolve um `Result`.
+- O **cubit** nunca vê uma exceção. Ele faz um `switch` no `Result` e emite um novo estado.
+- A **UI** decide como cada `Failure` aparece escrita, assim as mensagens podem ser traduzidas e o domínio não sabe nada de texto.
+
+### Decisões que valem explicar
+
+- **Cubit em vez de Bloc.** A tela tem poucas interações (carregar, buscar, carregar mais, atualizar), e métodos simples ficam mais legíveis que eventos para isso.
+- **Um `Result` selado e pequeno em vez do `dartz`.** Com as sealed classes e o pattern matching do Dart 3, o `Either` acrescenta pouco e traz uma dependência inteira junto.
+- **A paginação não mexe no status principal.** Se a segunda página falhar, os heróis que já estão na tela continuam lá e aparece um botão de tentar novamente no fim da lista.
+- **Respostas fora de ordem são descartadas.** Cada busca incrementa um contador no cubit; uma resposta que chega depois de uma busca mais nova ter começado é ignorada, então digitar rápido nunca mostra resultado de uma busca antiga.
+- **As chaves não ficam no código.** Elas vêm do `env.json` via `--dart-define-from-file`, e o arquivo está no `.gitignore`. Se o app for iniciado sem elas, aparece uma tela explicando o que fazer em vez de quebrar.
+- **Placeholder para imagens que faltam.** Muitos personagens usam a imagem de "image not available" da Marvel. O model trata isso como ausência de imagem e a UI desenha as iniciais sobre uma cor derivada do nome.
 
 ## Como rodar
 
-### 1. Obtenha uma chave da API da Marvel
+Você precisa de um Flutter stable recente (estou usando o 3.47) e de um par de chaves da API da Marvel.
 
-Cadastre-se em [developer.marvel.com](https://developer.marvel.com) e pegue suas chaves pública e privada.
+1. Crie uma conta em [developer.marvel.com](https://developer.marvel.com) e copie suas chaves pública e privada.
+2. Crie o seu arquivo de ambiente:
 
-### 2. Configure o ambiente
+   ```bash
+   cp env.example.json env.json
+   ```
 
-Este projeto lê as chaves da API em tempo de compilação via `--dart-define-from-file`, então nenhuma chave é commitada no repositório.
+3. Preencha o `env.json`:
 
-```bash
-cp env.example.json env.json
-```
+   ```json
+   {
+     "MARVEL_PUBLIC_API_KEY": "sua chave pública",
+     "MARVEL_PRIVATE_API_KEY": "sua chave privada"
+   }
+   ```
 
-Preencha o `env.json` com suas próprias chaves:
+4. Instale as dependências e rode:
 
-```json
-{
-  "MARVEL_PUBLIC_API_KEY": "sua-chave-publica-da-marvel",
-  "MARVEL_PRIVATE_API_KEY": "sua-chave-privada-da-marvel"
-}
-```
+   ```bash
+   flutter pub get
+   flutter run --dart-define-from-file=env.json
+   ```
 
-### 3. Instale as dependências
-
-```bash
-flutter pub get
-```
-
-### 4. Rode o app
-
-```bash
-flutter run --dart-define-from-file=env.json
-```
+No VS Code, a configuração em `.vscode/launch.json` já passa o arquivo de ambiente, então é só apertar F5.
 
 ## Testes
-
-O projeto tem testes unitários (models, repositório, use case, cubit, gerador de URL) e testes de widget (validação do login, estados da lista de heróis, tela de detalhes do herói).
 
 ```bash
 flutter test
 ```
 
-## Nota de segurança
+Tem testes unitários da assinatura das URLs, dos validadores, dos models do JSON, do data source (com o `MockClient` do `http`), do repositório (cada exceção mapeada para a sua failure), do use case e do cubit (`bloc_test`), além de testes de widget do login, dos estados da lista, da tela de detalhes e dos idiomas. O CI no GitHub Actions confere a formatação, roda o analyzer e os testes a cada push.
 
-Versões anteriores deste repositório tinham as chaves da API da Marvel commitadas em texto puro em `lib/core/key.dart`. Agora as chaves são lidas do `env.json` em tempo de compilação (veja [`env.example.json`](env.example.json) e [`lib/core/env_config.dart`](lib/core/env_config.dart)) e nunca são commitadas. Como as chaves antigas ficaram expostas no histórico do git de um repositório público, elas devem ser tratadas como comprometidas — gere novas chaves na sua conta do [developer.marvel.com](https://developer.marvel.com) antes de voltar a usar este projeto.
+## Próximos passos
+
+- Guardar as páginas em cache para a lista abrir offline.
+- Golden tests dos cards e da tela de detalhes.
+- Um teste de integração passando pelo fluxo todo contra um servidor fake.
+- Um fluxo de autenticação de verdade, se o app um dia tiver backend.
+
+## Observações
+
+- Dados fornecidos pela Marvel. © Marvel. O app mostra essa atribuição, como os termos da API pedem.
+- As primeiras versões deste repositório tinham as chaves da Marvel fixas em `lib/core/key.dart`. Elas continuam no histórico do git, então considere essas chaves revogadas.
+- A fonte dos títulos é a [Bebas Neue](https://fonts.google.com/specimen/Bebas+Neue), sob a SIL Open Font License (`assets/fonts/OFL.txt`).

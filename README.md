@@ -1,76 +1,113 @@
-# Cooper Tec
+# Cooper Tec · Marvel Heroes
 
-Read this in: **English** | [Português](README.pt-BR.md)
+**English** · [Português](README.pt-BR.md) · [Español](README.es.md)
 
-A small Flutter case study built for a technical interview at CooperTec. It logs a user in, fetches a list of Marvel heroes from the [Marvel API](https://developer.marvel.com), and lets the user open a hero to see its id and the series it appears in.
+[![CI](https://github.com/Lucasdiogof/cooper_tec/actions/workflows/ci.yml/badge.svg)](https://github.com/Lucasdiogof/cooper_tec/actions/workflows/ci.yml)
 
-## Why these choices
+A Flutter app that lists Marvel characters using the official [Marvel API](https://developer.marvel.com). I first built it in 2023 as the technical case for a job interview at CooperTec, back when I was just getting started with Flutter. Later I came back to it and rewrote most of it with what I've learned since, keeping the original scope: a login screen, a list of heroes and a details screen.
 
-- **Clean Architecture** — the project is tiny, but structuring it in `data` / `domain` / `presentation` layers keeps the Marvel API, the business rules and the UI independent from each other, and makes each piece easy to test in isolation.
-- **Cubit** (a slice of `flutter_bloc`) — a lighter-weight alternative to full Bloc for this project's simple state machine (`initial → loading → success/error`).
-- **GetIt** for dependency injection, wiring datasources, repositories, use cases and the cubit at [`lib/core/injection.dart`](lib/core/injection.dart).
-- **dartz's `Either`** to make failures explicit in the domain layer instead of relying on thrown exceptions.
+The goal of the repository is to show how I organize a Flutter project, so the code matters more here than the number of features.
 
-## App flow
+## What the app does
 
-1. **Login** — simple client-side validation (a valid email shape, a password with 6+ characters). There's no real backend behind it; it's a gate before the main flow.
-2. **Heroes list** — starts in a loading state, then shows the heroes returned by the Marvel API. A failed request shows a message with a retry button instead of the request just failing silently.
-3. **Hero details** — shows the hero's id and the series it has appeared in.
+- **Login** with form validation. There's no backend behind it, the case only asked for the screen.
+- **Heroes grid** with infinite scroll, pull to refresh and search by name (debounced while you type).
+- **Details** with the artwork, description, number of comics, series, stories and events, and the series the hero appears in.
+- Loading, empty and error states, with retry both for the first page and for the next ones.
+- Light and dark theme following the system.
+- Interface in English, Portuguese and Spanish, picked from the device language.
 
-## Project structure
+## Architecture
+
+The code is split by feature, and each feature follows Clean Architecture with three layers:
 
 ```
 lib/
-├── core/                    # env config, DI container, the Marvel URL/hash builder
-└── features/
-    ├── data/                # remote datasource, repository implementation, DTOs
-    ├── domain/               # entities, repository contract, use case
-    └── presentation/         # cubit, pages and widgets
+├── app/                      # MaterialApp, theme and localization setup
+├── core/                     # things shared by every feature
+│   ├── config/               # keys read with --dart-define
+│   ├── di/                   # get_it registrations
+│   ├── error/                # exceptions (data) and failures (domain)
+│   ├── network/              # signed Marvel API URLs
+│   ├── result/               # Result<T> = Ok | Err
+│   ├── theme/
+│   ├── validation/
+│   └── widgets/
+├── features/
+│   ├── auth/presentation/    # login screen
+│   └── characters/
+│       ├── data/             # remote data source, JSON models, repository implementation
+│       ├── domain/           # entities, repository contract, GetCharacters use case
+│       └── presentation/     # cubit, pages and widgets
+└── l10n/                     # .arb files (en, pt, es) and generated code
 ```
 
-## Getting started
+A request goes through the layers like this:
 
-### 1. Get a Marvel API key
-
-Sign up at [developer.marvel.com](https://developer.marvel.com) and grab your public and private keys.
-
-### 2. Configure your environment
-
-This project reads its API keys at compile time via `--dart-define-from-file`, so no secret ever gets committed to the repository.
-
-```bash
-cp env.example.json env.json
+```
+CharactersPage → CharactersCubit → GetCharacters → CharactersRepository → MarvelCharactersRemoteDataSource → Marvel API
 ```
 
-Fill in `env.json` with your own keys:
+- The **data source** only talks HTTP: it builds the signed URL, decodes the JSON and throws exceptions when something goes wrong.
+- The **repository** turns those exceptions into a `Failure` (no connection, invalid keys, rate limit, server error, unreadable response) and returns a `Result`.
+- The **cubit** never sees an exception. It does a `switch` on the `Result` and emits a new state.
+- The **UI** decides how each `Failure` is worded, so the messages can be translated and the domain doesn't know about text.
 
-```json
-{
-  "MARVEL_PUBLIC_API_KEY": "your-marvel-public-api-key",
-  "MARVEL_PRIVATE_API_KEY": "your-marvel-private-api-key"
-}
-```
+### Decisions worth explaining
 
-### 3. Install dependencies
+- **Cubit instead of Bloc.** The screen has few interactions (load, search, load more, refresh), and plain methods read better than events for that.
+- **A small sealed `Result` instead of `dartz`.** With Dart 3 sealed classes and pattern matching, `Either` doesn't add much and brings a whole dependency along.
+- **Pagination doesn't touch the main status.** If the second page fails, the heroes already on screen stay there and a retry button shows up at the bottom of the list.
+- **Out-of-order responses are discarded.** Each search bumps a counter in the cubit; a response that arrives after a newer search started is ignored, so typing fast never shows results for an old query.
+- **Keys don't live in the code.** They come from `env.json` through `--dart-define-from-file`, and the file is in `.gitignore`. If the app is started without them, it shows a screen explaining what to do instead of crashing.
+- **Placeholders for missing artwork.** Many characters use Marvel's "image not available" picture. The model treats it as having no image and the UI draws the initials over a colour derived from the name.
 
-```bash
-flutter pub get
-```
+## Running the project
 
-### 4. Run the app
+You need a recent stable Flutter (I'm using 3.47) and a key pair from the Marvel API.
 
-```bash
-flutter run --dart-define-from-file=env.json
-```
+1. Create an account at [developer.marvel.com](https://developer.marvel.com) and copy your public and private keys.
+2. Create your env file:
 
-## Testing
+   ```bash
+   cp env.example.json env.json
+   ```
 
-The project has unit tests (models, repository, use case, cubit, URL builder) and widget tests (login validation, heroes list states, hero detail screen).
+3. Fill in `env.json`:
+
+   ```json
+   {
+     "MARVEL_PUBLIC_API_KEY": "your public key",
+     "MARVEL_PRIVATE_API_KEY": "your private key"
+   }
+   ```
+
+4. Install the dependencies and run:
+
+   ```bash
+   flutter pub get
+   flutter run --dart-define-from-file=env.json
+   ```
+
+In VS Code, the configuration in `.vscode/launch.json` already passes the env file, so F5 works.
+
+## Tests
 
 ```bash
 flutter test
 ```
 
-## Security note
+There are unit tests for the URL signing, validators, JSON models, data source (with `MockClient` from `http`), repository (each exception mapped to its failure), use case and cubit (`bloc_test`), plus widget tests for the login, the list states, the details screen and the localization. The CI on GitHub Actions checks formatting, runs the analyzer and the tests on every push.
 
-Earlier revisions of this repository had Marvel API keys committed in plain text in `lib/core/key.dart`. Keys are now read from `env.json` at compile time (see [`env.example.json`](env.example.json) and [`lib/core/env_config.dart`](lib/core/env_config.dart)) and are never committed. Because the old keys were exposed in the git history of a public repository, they should be treated as compromised — regenerate them from your [developer.marvel.com](https://developer.marvel.com) account before relying on this project again.
+## What I'd do next
+
+- Cache the pages locally so the list opens offline.
+- Golden tests for the cards and the details screen.
+- An integration test running the whole flow against a fake server.
+- A real authentication flow, if the app ever had a backend.
+
+## Notes
+
+- Data provided by Marvel. © Marvel. The app shows this attribution, as required by the API terms.
+- The first versions of this repository had the Marvel keys hardcoded in `lib/core/key.dart`. They are still in the git history, so treat them as revoked.
+- The headline font is [Bebas Neue](https://fonts.google.com/specimen/Bebas+Neue), under the SIL Open Font License (`assets/fonts/OFL.txt`).

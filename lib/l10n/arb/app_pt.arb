@@ -1,0 +1,55 @@
+{
+  "@@locale": "pt",
+
+  "appTitle": "Heróis Marvel",
+
+  "loginSubtitle": "Entre para explorar milhares de personagens do universo Marvel.",
+  "emailLabel": "E-mail",
+  "passwordLabel": "Senha",
+  "showPassword": "Mostrar senha",
+  "hidePassword": "Ocultar senha",
+  "signIn": "Entrar",
+  "invalidEmail": "Informe um e-mail válido",
+  "passwordTooShort": "A senha deve ter pelo menos {min} caracteres",
+  "loginDisclaimer": "Login de demonstração: qualquer e-mail válido e uma senha com {min}+ caracteres funcionam.",
+  "builtFor": "Um case técnico feito para a CooperTec",
+
+  "charactersTitle": "Heróis",
+  "searchHint": "Buscar heróis pelo nome",
+  "clearSearch": "Limpar busca",
+  "signOut": "Sair",
+  "heroesCount": "{count, plural, =0{Nenhum herói} =1{1 herói} other{{count} heróis}}",
+  "emptyTitle": "Nenhum herói encontrado",
+  "emptyMessage": "A API da Marvel não retornou nenhum herói.",
+  "emptySearchMessage": "Nada corresponde a \"{query}\". Tente outro nome.",
+  "errorTitle": "Algo deu errado",
+  "retry": "Tentar novamente",
+  "loadMoreFailed": "Não foi possível carregar mais heróis.",
+  "endOfList": "Você já viu todos!",
+  "refreshFailed": "Não foi possível atualizar. Exibindo os últimos resultados.",
+
+  "failureNetwork": "Sem conexão com a internet. Verifique sua rede e tente novamente.",
+  "failureUnauthorized": "A API da Marvel recusou as credenciais. Confira as chaves no env.json.",
+  "failureRateLimited": "O limite de requisições da API da Marvel foi atingido. Tente novamente mais tarde.",
+  "failureServer": "A API da Marvel está indisponível no momento (erro {statusCode}).",
+  "failureParsing": "A API da Marvel enviou uma resposta que não conseguimos ler.",
+  "failureUnexpected": "Aconteceu algo inesperado. Tente novamente.",
+
+  "detailsAbout": "Sobre",
+  "detailsNoDescription": "A Marvel ainda não publicou uma descrição para este herói.",
+  "detailsId": "ID {id}",
+  "detailsLastUpdated": "Atualizado em {date}",
+  "detailsAppearances": "Aparições",
+  "statComics": "Quadrinhos",
+  "statSeries": "Séries",
+  "statStories": "Histórias",
+  "statEvents": "Eventos",
+  "detailsSeries": "Séries",
+  "detailsNoSeries": "Este herói ainda não apareceu em nenhuma série.",
+  "detailsMoreSeries": "{count, plural, =1{+1 série} other{+{count} séries}}",
+
+  "marvelAttribution": "Dados fornecidos pela Marvel. © {year} MARVEL",
+
+  "missingConfigTitle": "Chaves da API da Marvel ausentes",
+  "missingConfigMessage": "Copie o env.example.json para env.json, adicione suas chaves do developer.marvel.com e rode o app com:"
+}

@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "cooper_tec",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--dart-define-from-file=env.json"]
+    }
+  ]
+}

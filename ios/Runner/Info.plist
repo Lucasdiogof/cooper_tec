@@ -4,6 +4,12 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>pt</string>
+		<string>es</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Cooper Tec</string>
 	<key>CFBundleExecutable</key>
